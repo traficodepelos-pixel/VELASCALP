@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Acceso | Manuel Velasco Education</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --fondo: #E9EFEC;
+    --tarjeta: #FBFCFB;
+    --tinta: #14292E;
+    --suave: #52666B;
+    --linea: #C9D6D1;
+    --acento: #1F6F78;
+    --acento-oscuro: #17555C;
+    --error: #A8322A;
+    --error-fondo: #F8E6E3;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    font-family: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--fondo);
+    color: var(--tinta);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: max(20px, env(safe-area-inset-top)) 20px max(20px, env(safe-area-inset-bottom));
+  }
+  .caja {
+    width: 100%;
+    max-width: 400px;
+    background: var(--tarjeta);
+    border: 1px solid var(--linea);
+    border-radius: 14px;
+    padding: 36px 28px 30px;
+  }
+  .marca {
+    font-family: "Newsreader", Georgia, "Times New Roman", serif;
+    font-weight: 600;
+    font-size: 30px;
+    line-height: 1.15;
+    margin: 0 0 6px;
+  }
+  .sub { color: var(--suave); margin: 0 0 28px; font-size: 15px; line-height: 1.45; }
+  label { display: block; font-weight: 500; font-size: 14px; margin-bottom: 6px; }
+  input {
+    width: 100%;
+    font: inherit;
+    font-size: 16px; /* evita el zoom en iPhone */
+    padding: 13px 14px;
+    border: 1px solid var(--linea);
+    border-radius: 9px;
+    background: #fff;
+    color: var(--tinta);
+    margin-bottom: 18px;
+  }
+  input:focus-visible, button:focus-visible {
+    outline: 3px solid var(--acento);
+    outline-offset: 2px;
+  }
+  .clave { position: relative; }
+  .clave input { padding-right: 84px; }
+  .ver {
+    position: absolute; right: 6px; top: 6px;
+    background: none; border: 0; color: var(--acento-oscuro);
+    font: inherit; font-size: 14px; font-weight: 500;
+    padding: 8px 10px; cursor: pointer; border-radius: 7px;
+  }
+  .entrar {
+    width: 100%;
+    font: inherit; font-size: 16px; font-weight: 600;
+    background: var(--acento); color: #fff;
+    border: 0; border-radius: 9px;
+    padding: 14px; cursor: pointer;
+  }
+  .entrar:hover { background: var(--acento-oscuro); }
+  .entrar:disabled { opacity: .65; cursor: default; }
+  .aviso {
+    display: none;
+    background: var(--error-fondo);
+    color: var(--error);
+    border-radius: 9px;
+    padding: 12px 14px;
+    font-size: 14px;
+    line-height: 1.4;
+    margin-bottom: 18px;
+  }
+  .aviso.visible { display: block; }
+  .pie { color: var(--suave); font-size: 13px; margin: 22px 0 0; text-align: center; }
+</style>
+</head>
+<body>
+  <main class="caja">
+    <h1 class="marca">Manuel Velasco Education</h1>
+    <p class="sub">Escribe tu correo y contraseña para entrar.</p>
+
+    <div id="aviso" class="aviso" role="alert"></div>
+
+    <div id="formulario">
+      <label for="correo">Correo</label>
+      <input id="correo" type="email" autocomplete="username" inputmode="email" autocapitalize="none" spellcheck="false">
+
+      <label for="clave">Contraseña</label>
+      <div class="clave">
+        <input id="clave" type="password" autocomplete="current-password">
+        <button type="button" class="ver" id="ver">Mostrar</button>
+      </div>
+
+      <button type="button" class="entrar" id="entrar">Entrar</button>
+    </div>
+
+    <p class="pie">¿No tienes acceso? Pídeselo a Manuel.</p>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script>
+    // ====== DATOS DE TU PROYECTO (ya están puestos) ======
+    var SUPABASE_URL = "https://bzoiqehchfcerpscjufv.supabase.co";
+    var SUPABASE_KEY = "sb_publishable_YN5r6kSbIziAkIP5ecMamg_UObYVQ-5";
+
+    // ====== A QUÉ PÁGINA VA LA PERSONA DESPUÉS DE ENTRAR ======
+    // Cambia "index.html" por el nombre del archivo de tu app si es otro.
+    var DESTINO = "index.html";
+    // =======================================================
+
+    var db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    var aviso = document.getElementById("aviso");
+    var boton = document.getElementById("entrar");
+    var correo = document.getElementById("correo");
+    var clave = document.getElementById("clave");
+
+    function mostrarAviso(texto) {
+      aviso.textContent = texto;
+      aviso.classList.add("visible");
+    }
+
+    // Si ya iniciaste sesión antes, pasa directo.
+    db.auth.getSession().then(function (r) {
+      if (r.data && r.data.session) { window.location.replace(DESTINO); }
+    });
+
+    async function entrar() {
+      aviso.classList.remove("visible");
+      var c = correo.value.trim();
+      var p = clave.value;
+      if (!c || !p) { mostrarAviso("Escribe tu correo y tu contraseña."); return; }
+
+      boton.disabled = true;
+      boton.textContent = "Entrando...";
+      try {
+        var r = await db.auth.signInWithPassword({ email: c, password: p });
+        if (r.error) {
+          mostrarAviso("El correo o la contraseña no son correctos. Revísalos e inténtalo de nuevo.");
+        } else {
+          window.location.replace(DESTINO);
+          return;
+        }
+      } catch (e) {
+        mostrarAviso("No se pudo conectar. Revisa tu internet e inténtalo de nuevo.");
+      }
+      boton.disabled = false;
+      boton.textContent = "Entrar";
+    }
+
+    boton.addEventListener("click", entrar);
+    [correo, clave].forEach(function (el) {
+      el.addEventListener("keydown", function (e) { if (e.key === "Enter") entrar(); });
+    });
+
+    document.getElementById("ver").addEventListener("click", function () {
+      var oculto = clave.type === "password";
+      clave.type = oculto ? "text" : "password";
+      this.textContent = oculto ? "Ocultar" : "Mostrar";
+    });
+  </script>
+</body>
+</html>

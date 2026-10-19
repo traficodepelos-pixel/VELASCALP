@@ -1,0 +1,54 @@
+CÓMO PROTEGER TU PÁGINA (VELASCALP u otra)
+==========================================
+
+1) Abre tu archivo de la app (por ejemplo index.html) para editarlo.
+2) Busca la palabra  <head>  (casi al principio del archivo).
+3) Justo DESPUÉS de <head>, pega TODO el bloque de abajo
+   (desde la línea que dice INICIO hasta la que dice FIN).
+4) Guarda los cambios.
+
+Si tu archivo de la app NO se llama index.html, abre acceso.html y
+cambia en esa línea:  var DESTINO = "index.html";
+por el nombre correcto.
+
+------------------ INICIO (copia desde aquí) ------------------
+<style id="candado">html{visibility:hidden}</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+(async function () {
+  try {
+    var db = supabase.createClient(
+      "https://bzoiqehchfcerpscjufv.supabase.co",
+      "sb_publishable_YN5r6kSbIziAkIP5ecMamg_UObYVQ-5"
+    );
+    var r = await db.auth.getSession();
+    if (!r.data || !r.data.session) {
+      window.location.replace("acceso.html");
+      return;
+    }
+    document.getElementById("candado").remove();
+
+    function botonSalir() {
+      var b = document.createElement("button");
+      b.textContent = "Cerrar sesión";
+      b.style.cssText =
+        "position:fixed;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));" +
+        "z-index:99999;padding:9px 14px;border:0;border-radius:20px;" +
+        "background:#14292E;color:#fff;font:500 13px system-ui,sans-serif;opacity:.85;";
+      b.onclick = async function () {
+        await db.auth.signOut();
+        window.location.replace("acceso.html");
+      };
+      document.body.appendChild(b);
+    }
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", botonSalir);
+    } else {
+      botonSalir();
+    }
+  } catch (e) {
+    window.location.replace("acceso.html");
+  }
+})();
+</script>
+------------------- FIN (copia hasta aquí) --------------------
