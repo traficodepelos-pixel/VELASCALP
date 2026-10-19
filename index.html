@@ -2,21 +2,33 @@
 <html lang="es">
 <head>
 <style id="candado">html{visibility:hidden}</style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
-<script>
-(async function () {
-  try {
-    var db = supabase.createClient(
-      "https://bzoiqehchfcerpscjufv.supabase.co",
-      "sb_publishable_YN5r6kSbIziAkIP5ecMamg_UObYVQ-5"
-    );
-    var r = await db.auth.getSession();
-    if (!r.data || !r.data.session) {
-      window.location.replace("acceso.html");
-      return;
-    }
-    document.getElementById("candado").remove();
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
+<script>
+  // Configuración de tu proyecto Firebase VELASCALP
+  const firebaseConfig = {
+    authDomain: "velascalp.firebaseapp.com",
+    projectId: "velascalp",
+    storageBucket: "velascalp.appspot.com"
+  };
+
+  // Inicializar Firebase
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
+
+  // Verificar la sesión del usuario
+  firebase.auth().onAuthStateChanged((user) => {
+    if (!user) {
+      window.location.replace("acceso.html");
+    } else {
+      const candado = document.getElementById("candado");
+      if (candado) candado.remove();
+    }
+  });
+</script>
     function botonSalir() {
       var b = document.createElement("button");
       b.textContent = "Cerrar sesión";
