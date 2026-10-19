@@ -449,3 +449,44 @@ drawNav();
 </script>
 </body>
 </html>
+<!-- Módulos de Firebase para Autenticación -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+  // Configuración de tu proyecto VELASCALP en Firebase
+  const firebaseConfig = {
+    apiKey: "TU_API_KEY",
+    authDomain: "velascalp.firebaseapp.com",
+    projectId: "velascalp",
+    storageBucket: "velascalp.appspot.com",
+    messagingSenderId: "TU_MESSAGING_SENDER_ID",
+    appId: "TU_APP_ID"
+  };
+
+  // Inicializar Firebase
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  // Función para Iniciar Sesión
+  window.iniciarSesion = function(email, password) {
+    signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        alert("¡Bienvenido a VELASCALP!");
+      })
+      .catch((error) => {
+        alert("Error de acceso: " + error.message);
+      });
+  };
+
+  // Función para Registrar Nuevo Usuario
+  window.registrarUsuario = function(email, password) {
+    createUserWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        alert("¡Usuario registrado exitosamente!");
+      })
+      .catch((error) => {
+        alert("Error de registro: " + error.message);
+      });
+  };
+</script>
